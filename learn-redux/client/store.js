@@ -14,8 +14,20 @@ const defaultState = {
   comments // cool es6 thing
 }
 
-const store = createStore(rootReducer, defaultState);
+// making the store accessible to the redux dev tools
+const enhancers = compose(
+  window.devToolsExtension ? window.devToolsExtension() : f => f
+)
+
+const store = createStore(rootReducer, defaultState, enhancers);
 
 export const history = syncHistoryWithStore(browserHistory, store);
+
+if(module.hot) {
+  module.hot.accept('./reducers/', () => {
+    const nextRootReducer = require('./reducers/index').default;
+    store.replaceReducer(nextRootReducer);
+  })
+}
 
 export default store;
